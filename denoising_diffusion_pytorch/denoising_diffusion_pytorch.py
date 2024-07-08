@@ -792,8 +792,7 @@ class GaussianDiffusion(Module):
         x_self_cond = None
         if self.self_condition and random() < 0.5:
             with torch.no_grad():
-                x_self_cond = self.model_predictions(x, t
-                                                     ).pred_x_start
+                x_self_cond = self.model_predictions(x, t).pred_x_start
                 x_self_cond.detach_()
 
         # predict and take gradient step
