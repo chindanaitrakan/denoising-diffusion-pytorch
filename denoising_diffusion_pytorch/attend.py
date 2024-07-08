@@ -102,7 +102,7 @@ class Attend(nn.Module):
         """
 
         q_len, k_len, device = q.shape[-2], k.shape[-2], q.device
-
+        
         if self.flash:
             return self.flash_attn(q, k, v)
 

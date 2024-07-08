@@ -792,7 +792,8 @@ class GaussianDiffusion(Module):
         x_self_cond = None
         if self.self_condition and random() < 0.5:
             with torch.no_grad():
-                x_self_cond = self.model_predictions(x, t).pred_x_start
+                x_self_cond = self.model_predictions(x, t
+                                                     ).pred_x_start
                 x_self_cond.detach_()
 
         # predict and take gradient step
@@ -1059,15 +1060,17 @@ class Trainer:
                     self.ema.update()
 
                     if self.step != 0 and divisible_by(self.step, self.save_and_sample_every):
+                        print("Evaluate model")
                         self.ema.ema_model.eval()
 
                         with torch.inference_mode():
+                            print("This is in inference mode")
                             milestone = self.step // self.save_and_sample_every
                             batches = num_to_groups(self.num_samples, self.batch_size)
                             all_images_list = list(map(lambda n: self.ema.ema_model.sample(batch_size=n), batches))
 
                         all_images = torch.cat(all_images_list, dim = 0)
-
+                        print("Saving images....")
                         utils.save_image(all_images, str(self.results_folder / f'sample-{milestone}.png'), nrow = int(math.sqrt(self.num_samples)))
 
                         # whether to calculate fid
@@ -1075,7 +1078,7 @@ class Trainer:
                         if self.calculate_fid:
                             fid_score = self.fid_scorer.fid_score()
                             accelerator.print(f'fid_score: {fid_score}')
-
+                        print("save best model")
                         if self.save_best_and_latest_only:
                             if self.best_fid > fid_score:
                                 self.best_fid = fid_score
@@ -1083,7 +1086,7 @@ class Trainer:
                             self.save("latest")
                         else:
                             self.save(milestone)
-
+                        print("Finish")
                 pbar.update(1)
 
         accelerator.print('training complete')
